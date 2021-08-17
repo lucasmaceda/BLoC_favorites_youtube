@@ -32,8 +32,9 @@ class Api {
   List<Video> decode(http.Response response) {
     if (response.statusCode == 200) {
       var decoded = jsonDecode(response.body)['items'];
+      var token = jsonDecode(response.body)['nextPageToken'];
 
-      _nextToken = decoded['nextPageToken'];
+      _nextToken = token;
 
       List<Video> videos =
           decoded.map<Video>((map) => Video.fromJson(map)).toList();

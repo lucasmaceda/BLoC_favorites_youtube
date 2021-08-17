@@ -1,12 +1,16 @@
+import 'package:app_favoritos_youtube/bloc/favorite_bloc.dart';
 import 'package:app_favoritos_youtube/bloc/videos_bloc.dart';
 import 'package:app_favoritos_youtube/delegates/data_search.dart';
+import 'package:app_favoritos_youtube/models/video.dart';
 import 'package:app_favoritos_youtube/widget/videos.dart';
 import 'package:bloc_pattern/bloc_pattern.dart';
 import 'package:flutter/material.dart';
 
-class Home extends StatelessWidget {
-  final bloc = BlocProvider.getBloc<VideosBloc>();
+import 'favorites.dart';
 
+final bloc = BlocProvider.getBloc<VideosBloc>();
+
+class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,11 +24,23 @@ class Home extends StatelessWidget {
         actions: <Widget>[
           Align(
             alignment: Alignment.center,
-            child: Text("0"),
+            child: StreamBuilder<Map<String, Video>>(
+                stream: BlocProvider.getBloc<FavoriteBloc>().outFav,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData)
+                    return Text('${snapshot.data.length}');
+                  else
+                    return Container();
+                }),
           ),
           IconButton(
-            onPressed: () {},
             icon: Icon(Icons.star),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Favorites()),
+              );
+            },
           ),
           IconButton(
             onPressed: () async {
@@ -39,7 +55,6 @@ class Home extends StatelessWidget {
       backgroundColor: Colors.black,
       body: StreamBuilder(
         stream: bloc.outVideos,
-        initialData: [],
         builder: (context, snapshot) {
           if (snapshot.hasData)
             return ListView.builder(
